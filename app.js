@@ -30,8 +30,14 @@ app.get("/", (req, res) => {
 
 //Index Route
 app.get("/listings", async (req, res) => {
-  const allListings = await Listing.find({});
-  res.render("listings/index.ejs", { allListings });
+  try {
+    const allListings = await Listing.find({});
+    console.log(allListings); // Debug log
+    res.render("listings/index", { allListings });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
 });
 
 //New Route

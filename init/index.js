@@ -17,9 +17,17 @@ async function main() {
 }
 
 const initDB = async () => {
-  await Listing.deleteMany({});
-  await Listing.insertMany(initData.data);
-  console.log("data was initialized");
+  try {
+    await Listing.deleteMany({});
+    const validData = initData.data.map((item) => ({
+      ...item,
+      _id: item._id || new mongoose.Types.ObjectId(),
+    }));
+    await Listing.insertMany(validData);
+    console.log("Data was initialized");
+  } catch (err) {
+    console.error("Error initializing data:", err);
+  }
 };
 
 initDB();
