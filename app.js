@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "public")))
-app.use(express.static(path.resolve(__dirname, 'public')));
+
 
 app.get("/", (req, res) => {
   res.send("Hi, I am root");
@@ -58,9 +58,13 @@ app.get("/listings/:id", async (req, res) => {
 
 //Create Route
 app.post("/listings", async (req, res) => {
-  const newListing = new Listing(req.body.listing);
-  await newListing.save();
-  res.redirect("/listings");
+  try {
+    const newListing = new Listing(req.body.listing);
+    await newListing.save();
+    res.redirect("/listings");
+  } catch (err) {
+    res.status(500).send("Something went wrong!");
+  }
 });
 
 //Edit Route
