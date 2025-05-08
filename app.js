@@ -1,133 +1,155 @@
-
-//require express app
+// require express app
 const express = require("express");
 // create express app
 const app = express();
-// mongoose for used mongoDB database
+// mongoose for MongoDB
 const mongoose = require("mongoose");
-// require ing listings of schema models
+// schema model
 const Listing = require("./models/listing.js");
 const path = require("path");
-// method-override is used to put and delete request
+// method-override for PUT & DELETE requests
 const methodOverride = require("method-override");
-// ejs-mate used for layouts
-const ejsMate = require('ejs-mate');
-//wrapAsync import
-const wrapAsync = require('./utils/wrapAsync.js')
-// ExpressError import
-const ExpressError = require('./utils/expressError.js')
+// ejs-mate for layout support
+const ejsMate = require("ejs-mate");
+// custom async wrapper
+const wrapAsync = require("./utils/wrapAsync.js");
+// custom ExpressError class
+const ExpressError = require("./utils/expressError.js");
 
-// mongoDB connection URL
+
+// MongoDB connection URL
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
-// mongoDB connection code
+
+// Connect to MongoDB
 main()
-  .then(() => {
-    console.log("connected to DB");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+    .then(() => {
+        console.log("Connected to DB");
+    })
+    .catch((err) => {
+        console.log("DB connection error:", err);
+    });
+
 
 async function main() {
-  await mongoose.connect(MONGO_URL);
+    await mongoose.connect(MONGO_URL);
 }
 
+
+// Express config
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.engine("ejs", ejsMate);
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
-app.engine("ejs", ejsMate);
-app.use(express.static(path.join(__dirname, "public")))
+app.use(express.static(path.join(__dirname, "public")));
 
-//Home route
+
+// Home route
 app.get("/", (req, res) => {
-  res.send("Hi, I am root");
+    res.send("Hi, I am root");
 });
 
-//Index Route
-app.get("/listings", wrapAsync(async (req, res, next) => {
-  const allListings = await Listing.find({});
-  console.log(allListings); // Debug log
-  res.render("listings/index", { allListings });
-}));
 
-//New Route
-app.get("/listings/new", wrapAsync((req, res) => {
-  res.render("listings/new.ejs");
-}));
+// Index Route
+app.get(
+    "/listings",
+    wrapAsync(async (req, res) => {
+        const allListings = await Listing.find({});
+        res.render("listings/index", { allListings });
+    })
+);
 
-//Show Route
-app.get("/listings/:id", wrapAsync(async (req, res) => {
-  let { id } = req.params;
-  const listing = await Listing.findById(id);
-  res.render("listings/show.ejs", { listing });
-}));
 
-//Create Route
-app.post("/listings", wrapAsync(async (req, res) => {
-  //without filled data try to submiting data in using url call api
-  if (!req.body.Listing) {
-    throw new ExpressError(400, "Send valid data for listing");
-  }
-  const newListing = new Listing(req.body.listing);
-  await newListing.save();
-  res.redirect("/listings");
-}));
+// New Route
+app.get(
+    "/listings/new",
+    wrapAsync((req, res) => {
+        res.render("listings/new.ejs");
+    })
+);
 
-//Edit Route
-app.get("/listings/:id/edit", wrapAsync(async (req, res) => {
-  let { id } = req.params;
-  const listing = await Listing.findById(id);
-  res.render("listings/edit.ejs", { listing });
-}));
 
-//Update Route
-app.put("/listings/:id", wrapAsync(async (req, res) => {
-  let { id } = req.params;
-  await Listing.findByIdAndUpdate(id, { ...req.body.listing });
-  res.redirect(`/listings/${id}`);
-}));
+// Show Route
+app.get(
+    "/listings/:id",
+    wrapAsync(async (req, res) => {
+        const { id } = req.params;
+        const listing = await Listing.findById(id);
+        if (!listing) throw new ExpressError(404, "Listing not found");
+        res.render("listings/show.ejs", { listing });
+    })
+);
+//create route
+app.post("/listings", async (req, res, next) => {
+    try {
+        const { listing } = req.body;
+        if (!listing || !listing.title || !listing.price || !listing.description || !listing.location || !listing.country) {
+            throw new ExpressError(400, "all inputs are are required.");
+        }
+        const newListing = new Listing(listing);
+        await newListing.save();
+        res.redirect("/listings");
+    } catch (err) {
+        if (res.headersSent) {
+            return next(err);
+        }
+        if (err.name === "ValidationError") {
+            const messages = Object.values(err.errors).map(e => e.message).join(", ");
+            return res.status(400).render("error.ejs", { err: new ExpressError(400, messages) });
+        }
 
-//Delete Route
-app.delete("/listings/:id", wrapAsync(async (req, res) => {
+        next(err);
+    }
+});
+// Edit Route
+app.get(
+    "/listings/:id/edit",
+    wrapAsync(async (req, res) => {
+        const { id } = req.params;
+        const listing = await Listing.findById(id);
+        if (!listing) throw new ExpressError(404, "Listing not found");
+        res.render("listings/edit.ejs", { listing });
+    })
+);
 
-  //without filled data try to submiting data in using url call api
-  if (!req.body.Listing) {
-    throw new ExpressError(400, "Send valid data for listing");
-  }
-  let { id } = req.params;
-  let deletedListing = await Listing.findByIdAndDelete(id);
-  console.log(deletedListing);
-  res.redirect("/listings");
-}));
 
-// app.get("/testListing", async (req, res) => {
-//   let sampleListing = new Listing({
-//     title: "My New Villa",
-//     description: "By the beach",
-//     price: 1200,
-//     location: "Calangute, Goa",
-//     country: "India",
-//   });
+// Update Route
+app.put(
+    "/listings/:id",
+    wrapAsync(async (req, res) => {
+        const { id } = req.params;
+        await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+        res.redirect(`/listings/${id}`);
+    })
+);
 
-//   await sampleListing.save();
-//   console.log("sample was saved");
-//   res.send("successful testing");
-// });
 
+// Delete Route
+app.delete(
+    "/listings/:id",
+    wrapAsync(async (req, res) => {
+        const { id } = req.params;
+        const deletedListing = await Listing.findByIdAndDelete(id);
+        if (!deletedListing) throw new ExpressError(404, "Listing not found");
+        res.redirect("/listings");
+    })
+);
+
+
+// 404 handler
 app.all("*", (req, res, next) => {
-  next(new ExpressError(404, "Page Not Found"));
-})
-
-
-//Error handling middlewares 
-app.use((err, re, res, next) => {
-  let { statusCode = 500, message = "Something went wrong!" } = err;
-  res.render("error.ejs", { err });
-  // res.status(statusCode).send(message);
-})
-
+    next(new ExpressError(404, "Page Not Found"));
+});
+app.use((err, req, res, next) => {
+    const { statusCode = 500 } = err;
+    if (res.headersSent) {
+        return next(err); // don’t try to render again
+    }
+    if (!err.message) err.message = "Something went wrong!";
+    res.status(statusCode).render("error.ejs", { err });
+});
+// Server start
 app.listen(8080, () => {
-  console.log("server is listening to port 8080");
+    console.log("Server is listening on port 8080");
 });
