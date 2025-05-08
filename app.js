@@ -15,6 +15,7 @@ const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 // custom ExpressError class
 const ExpressError = require("./utils/expressError.js");
+const { listingSchema } = require("./schema.js")
 
 
 // MongoDB connection URL
@@ -81,7 +82,7 @@ app.get(
     })
 );
 //create route
-app.post("/listings", async (req, res, next) => {
+app.post("/listings", wrapAsync(async (req, res, next) => {
     try {
         const { listing } = req.body;
         if (!listing || !listing.title || !listing.price || !listing.description || !listing.location || !listing.country) {
@@ -101,7 +102,9 @@ app.post("/listings", async (req, res, next) => {
 
         next(err);
     }
-});
+ 
+   
+}));
 // Edit Route
 app.get(
     "/listings/:id/edit",
