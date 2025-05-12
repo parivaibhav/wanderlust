@@ -15,9 +15,10 @@ const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 // custom ExpressError class
 const ExpressError = require("./utils/expressError.js");
-const { listingSchema } = require("./schema.js")
-
-
+// Joi for validation Schema for Server
+const { listingSchema, reviewSchema } = require("./schema.js")
+// Review model
+const Review = require("./models/review.js")
 // MongoDB connection URL
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
@@ -51,6 +52,28 @@ app.get("/", (req, res) => {
     res.send("Hi, I am root");
 });
 
+// Middleware for validating listing data
+const validateListing = (req, res, next) => {
+    let { error } = listingSchema.validate(req.body);
+    if (error) {
+        let errMsg = error.details.map(el => el.message).join(",");
+        throw new ExpressError(400, errMsg);
+    } else {
+        next();
+    }
+}
+
+
+// Middleware for validating reviews
+const validateReview = (req, res, next) => {
+    let { error } = reviewSchema.validate(req.body);
+    if (error) {
+        let errMsg = error.details.map(el => el.message).join(", ");
+        throw new ExpressError(400, errMsg);
+    } else {
+        next();
+    }
+}
 
 // Index Route
 app.get(
@@ -76,19 +99,16 @@ app.get(
     "/listings/:id",
     wrapAsync(async (req, res) => {
         const { id } = req.params;
-        const listing = await Listing.findById(id);
+        const listing = await Listing.findById(id).populate("reviews"); // populate reviews
         if (!listing) throw new ExpressError(404, "Listing not found");
         res.render("listings/show.ejs", { listing });
     })
 );
 //create route
-app.post("/listings", wrapAsync(async (req, res, next) => {
+app.post("/listings", validateListing, wrapAsync(async (req, res, next) => {
     try {
-        const { listing } = req.body;
-        if (!listing || !listing.title || !listing.price || !listing.description || !listing.location || !listing.country) {
-            throw new ExpressError(400, "all inputs are are required.");
-        }
-        const newListing = new Listing(listing);
+
+        const newListing = new Listing(req.body.listing);
         await newListing.save();
         res.redirect("/listings");
     } catch (err) {
@@ -99,11 +119,10 @@ app.post("/listings", wrapAsync(async (req, res, next) => {
             const messages = Object.values(err.errors).map(e => e.message).join(", ");
             return res.status(400).render("error.ejs", { err: new ExpressError(400, messages) });
         }
-
         next(err);
     }
- 
-   
+
+
 }));
 // Edit Route
 app.get(
@@ -138,6 +157,19 @@ app.delete(
         res.redirect("/listings");
     })
 );
+
+// Reviews routes Post route
+app.post("/listings/:id/reviews", validateReview, wrapAsync(async (req, res) => {
+    let listing = await Listing.findById(req.params.id);
+    let newReview = new Review(req.body.review);
+
+    listing.reviews.push(newReview);
+    await newReview.save();
+    await listing.save();
+
+    console.log("New review Saved");
+    res.redirect(`/listings/${listing._id}`);
+}))
 
 
 // 404 handler

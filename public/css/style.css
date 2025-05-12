@@ -59,7 +59,7 @@ body {
   align-items: space-evenly;
 }
 
-.card {
+.listing-card {
   border: none !important;
   margin-bottom: 2rem;
 }
@@ -121,4 +121,8 @@ body {
 .show-card {
   padding-right: 0;
   padding-left: 0;
+}
+
+footer {
+  margin: 0;
 }
