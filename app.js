@@ -172,6 +172,18 @@ app.post("/listings/:id/reviews", validateReview, wrapAsync(async (req, res) => 
 }))
 
 
+// Reviews routes Delete route
+// Delete review route
+app.delete("/listings/:id/reviews/:reviewId", wrapAsync(async (req, res) => {
+    let { id, reviewId } = req.params;
+    // Find the listing and remove the review from its reviews array
+    await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    // Delete the review from the Review collection
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/listings/${id}`);
+}))
+
+
 // 404 handler
 app.all("*", (req, res, next) => {
     next(new ExpressError(404, "Page Not Found"));
