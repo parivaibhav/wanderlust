@@ -12,7 +12,8 @@
       <div class="card-body">
         <p class="card-text">
           <%= listing.description %> <br>
-            &#8377; <%= listing.price.toLocaleString("en-IN") %> <br>
+            <%= listing.price.toLocaleString('en-IN', { style: 'currency' , currency: 'INR' , minimumFractionDigits: 0,
+              maximumFractionDigits: 0 }); %> <br>
               <%= listing.location %> <br>
                 <%= listing.country %>
         </p>
@@ -24,9 +25,6 @@
         </form>
       </div>
     </div>
-
-
-
 
     <div class="row justify-content-center">
       <div class="col-md-8">
@@ -71,7 +69,6 @@
                 class="my-2">
                 <button class="btn btn-danger">Delete</button>
               </form>
-
             </div>
             <% } %>
         </div>

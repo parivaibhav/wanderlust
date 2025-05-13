@@ -3,7 +3,7 @@ const router = express.Router({ mergeParams: true });
 const wrapAsync = require("../utils/wrapAsync.js");
 const { reviewSchema } = require("../schema.js");
 const ExpressError = require("../utils/expressError.js");
-const Review = require("../models/listing.js");
+const Review = require("../models/review.js");
 const Listing = require("../models/listing.js");
 
 
@@ -22,15 +22,18 @@ const validateReview = (req, res, next) => {
 
 // Reviews routes Post route
 router.post("/", validateReview, wrapAsync(async (req, res) => {
-    let listing = await Listing.findById(req.params.id);
-    let newReview = new Review(req.body.review);
-    
-    listing.reviews.push(newReview);
-    await newReview.save();
+    let { id } = req.params;
+    // Find the listing by ID
+    let listing = await Listing.findById(id);
+    // Create a new review
+    let review = new Review(req.body.review);
+    // Associate the review with the listing
+    listing.reviews.push(review);
+    // Save the review and the listing
+    await review.save();
     await listing.save();
+    res.redirect(`/listings/${id}`);
 
-    console.log("New review Saved");
-    res.redirect(`/listings/${listing._id}`);
 }))
 
 
