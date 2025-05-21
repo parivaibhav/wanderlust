@@ -1,4 +1,3 @@
-t
 
 ## About
 
@@ -44,5 +43,5 @@ The application should now be running locally. the backend API at `http://localh
 
 ## Connect with Me
 
-[![Instagram](https://img.shields.io/badge/Instagram-@yourusername-E4405F?style=flat&logo=instagram&logoColor=white)](https://instagram.com/vaibhhav87)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-YourName-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/vaibhav-pari-399a88230/)
+[![Instagram](https://img.shields.io/badge/Instagram-@vaibhhav87-E4405F?style=flat&logo=instagram&logoColor=white)](https://instagram.com/vaibhhav87)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-vaibhav-pari-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/vaibhav-pari-399a88230/)
