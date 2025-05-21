@@ -22,8 +22,10 @@ const initDB = async () => {
     const validData = initData.data.map((item) => ({
       ...item,
       _id: item._id || new mongoose.Types.ObjectId(),
+      owner: "682c13000824c2a774cfa835",
     }));
     await Listing.insertMany(validData);
+
     console.log("Data was initialized");
   } catch (err) {
     console.error("Error initializing data:", err);
