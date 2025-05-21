@@ -1,60 +1,44 @@
+
+// Import the Express framework
 const express = require("express");
+
+// Create a new router object to define route handlers
 const router = express.Router();
+
+// Import the User model for interacting with user data in the database
 const User = require("../models/user.js");
+
+// Import a utility to wrap async route handlers and catch errors
 const wrapAsync = require("../utils/wrapAsync.js");
+
+// Import Passport.js for authentication
 const passport = require("passport");
+
+// Import custom middleware to save the URL a user was trying to access
 const { saveRedirectUrl } = require("../middleware.js");
 
+// Import the user controller, which contains functions for handling user-related routes
+const userCantroller = require("../cantrollers/user.js")
 
+// Route to render the signup form page
+router.get("/signup", userCantroller.renderSignupForm)
 
-router.get("/signup", async (req, res) => {
-    res.render("users/signup.ejs");
-})
+// Route to handle signup form submission, wrapped to handle errors
+router.post("/signup", wrapAsync(userCantroller.userRegister))
 
-router.post("/signup", wrapAsync(async (req, res) => {
-    try {
-        let { username, email, password } = req.body;
-        const newUser = new User({ email, username })
-        const registeredUser = await User.register(newUser, password);
-        console.log(registeredUser);
-        req.login(registeredUser, (err) => {
-            if (err) {
-                return next(err);
-            }
-            req.flash("success", "user register Sucessfully! Welcome to wanderlust");
-            res.redirect("/listings");
-        })
-    } catch (e) {
-        req.flash("error", e.message);
-        res.redirect("/signup");
-    }
-}))
+// Route to render the login form page
+router.get("/login", userCantroller.renderLoginForm)
 
+// Route to handle login form submission, with middleware for redirect and authentication
+router.post(
+    "/login",
+    saveRedirectUrl, // Save the original URL before login
+    passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), // Authenticate user
+    userCantroller.renderLoginPage // Render the login page after successful login
+)
 
-router.get("/login", async (req, res) => {
-    res.render("users/login.ejs");
-})
+// Route to handle user logout
+router.get("/logout", userCantroller.renderLogout)
 
-
-router.post("/login",
-    saveRedirectUrl,
-    passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }),
-    async (req, res) => {
-        req.flash("success", "Welcome to wanderlust! You are logged In");
-        let redirectUrl = res.locals.redirectUrl || "/listings";
-        res.redirect(redirectUrl);
-    })
-
-
-router.get("/logout", async (req, res) => {
-    req.logout((err) => {
-        if (err) {
-            return next(err);
-        }
-        req.flash("success", "you're sucessfully logout");
-        res.redirect("/listings");
-    })
-})
-
-
-module.exports = router;    
+// Export the router to be used in other parts of the application
+module.exports = router;
