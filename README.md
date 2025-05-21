@@ -23,7 +23,6 @@ Follow these steps to set up the project locally:
 2. **Install backend dependencies:**
 
    ```bash
-   cd backend
    npm install
    ```
 
