@@ -22,7 +22,7 @@ router.route("/")
 
 router.get('/search', wrapAsync(listingCantroller.searchListing))
 
-
+router.get("/", wrapAsync(listingCantroller.homeRoute));
 
 // New Route
 router.get("/new", isLoggedIn, wrapAsync(listingCantroller.renderNewForm));

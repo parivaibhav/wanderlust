@@ -1,6 +1,8 @@
 const Listing = require("../models/listing.js");
 
-
+module.exports.homeRoute = async (req, res) => {
+    res.redirect("/listings/index.ejs");
+}
 
 module.exports.index = async (req, res) => {
     const allListings = await Listing.find({});
