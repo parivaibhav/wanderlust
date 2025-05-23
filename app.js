@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const store = MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     crypto: {
-        secret: "mysupersecretcode",
+        secret: process.env.SECERT,
     },
     touchAfter: 24 * 3600,
 });
@@ -54,7 +54,7 @@ store.on("error", () => {
 
 const sessionOptions = {
     store: store,
-    secret: "mysupersecretcode",
+    secret: process.env.SECERT,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -92,6 +92,10 @@ app.use((req, res, next) => {
 //     let registerUser = await User.register(fakeUser, "Helloworld") // insert in db second is password
 //     res.send(registerUser);
 // })
+
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+})
 
 app.use("/listings", listingsRoutes);
 app.use("/listings/:id/reviews", reviewsRoutes);
