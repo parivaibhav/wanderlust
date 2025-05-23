@@ -4,13 +4,12 @@ module.exports.renderSignupForm = async (req, res) => {
     res.render("users/signup.ejs");
 }
 
-
 module.exports.userRegister = async (req, res) => {
     try {
         let { username, email, password } = req.body;
         const newUser = new User({ email, username })
         const registeredUser = await User.register(newUser, password);
-        console.log(registeredUser);
+        // console.log(registeredUser);
         req.login(registeredUser, (err) => {
             if (err) {
                 return next(err);

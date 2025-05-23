@@ -5,7 +5,7 @@ const { listingSchema, reviewSchema } = require("./schema.js");
 const ExpressError = require("./utils/expressError.js");
 
 module.exports.isLoggedIn = (req, res, next) => {
-    console.log(req.user);
+   //  console.log(req.user);
     if (!req.isAuthenticated()) {
         req.session.redirectUrl = req.originalUrl
         req.flash("error", "you must be logged in to create a listing");

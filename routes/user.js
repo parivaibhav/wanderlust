@@ -20,22 +20,22 @@ const { saveRedirectUrl } = require("../middleware.js");
 // Import the user controller, which contains functions for handling user-related routes
 const userCantroller = require("../cantrollers/user.js")
 
-// Route to render the signup form page
-router.get("/signup", userCantroller.renderSignupForm)
+router.route("/signup")
+    // Route to render the signup form page
+    .get(userCantroller.renderSignupForm)
+    // Route to handle signup form submission, wrapped to handle errors
+    .post(wrapAsync(userCantroller.userRegister));
 
-// Route to handle signup form submission, wrapped to handle errors
-router.post("/signup", wrapAsync(userCantroller.userRegister))
 
-// Route to render the login form page
-router.get("/login", userCantroller.renderLoginForm)
-
-// Route to handle login form submission, with middleware for redirect and authentication
-router.post(
-    "/login",
-    saveRedirectUrl, // Save the original URL before login
-    passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), // Authenticate user
-    userCantroller.renderLoginPage // Render the login page after successful login
-)
+router
+    .route("/login")
+    // Route to render the login form page
+    .get(userCantroller.renderLoginForm)
+    .post(
+        saveRedirectUrl,
+        passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }),
+        userCantroller.renderLoginPage
+    );
 
 // Route to handle user logout
 router.get("/logout", userCantroller.renderLogout)

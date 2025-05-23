@@ -1,7 +1,19 @@
+@font-face {
+  font-family: "Airbnb Medium";
+  src: url("./fonts/AirbnbCereal_W_Md.otf");
+  font-size: medium;
+}
+
+@font-face {
+  font-family: "Airbnb Normal";
+  src: url("./fonts/AirbnbCereal_W_Bk.otf");
+}
+
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
 
 body {
-  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-family: "Airbnb Normal", sans-serif !important;
+  /*"Plus Jakarta Sans"*/
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -10,10 +22,18 @@ body {
 .container {
   flex: 1;
 }
+
 /* Navbar */
 .navbar {
   height: 5rem;
   background-color: #fff;
+}
+
+
+.navbar-brand {
+  font-family: "Airbnb Medium" !important;
+  color: #ff385c !important;
+  font-weight: 200 !important;
 }
 
 /* Icon */
@@ -125,4 +145,13 @@ body {
 
 footer {
   margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Airbnb Medium" !important;
 }
