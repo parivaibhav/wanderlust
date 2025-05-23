@@ -1,8 +1,5 @@
 const Listing = require("../models/listing.js");
 
-module.exports.homeRoute = async (req, res) => {
-    res.render("/listings/home.ejs");
-}
 
 module.exports.index = async (req, res) => {
     const allListings = await Listing.find({});

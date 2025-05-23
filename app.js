@@ -93,7 +93,9 @@ app.use((req, res, next) => {
 //     res.send(registerUser);
 // })
 
-
+app.get("/", async (req, res) => {
+    res.render("/listings/home.ejs");
+})
 
 app.use("/listings", listingsRoutes);
 app.use("/listings/:id/reviews", reviewsRoutes);
