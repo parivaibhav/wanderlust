@@ -1,36 +1,165 @@
 <% layout("/layouts/boillerplate.ejs") %>
 
-  <body>
-      <h3>All Listings</h3>
-      <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 row-cols-1">
+  <style>
+    #filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
 
-        <% if (allListings && allListings.length> 0) { %>
-          <% for (let listing of allListings) { %>
+    .filter {
+      text-align: center;
+      margin-right: 2rem;
+      margin-top: 2rem;
+      opacity: 0.7;
+      cursor: pointer;
+    }
 
-            <% if (listing._id) { %>
-              <a href="/listings/<%= listing._id %>" class="listing-link">
-                <div class="card col listing-card">
-                  <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height: 20rem;">
-                  <div class="card-img-overlay">
-                    <p><%= listing.title %></p>
-                  </div>
-                  <div class="card-body">
-                    <p class="card-text">
-                      <b>
-                        <%= listing.title %>
-                      </b> <br>
-                      <%= listing.price.toLocaleString('en-IN', { style: 'currency' , currency: 'INR'
-                        ,minimumFractionDigits: 0, maximumFractionDigits: 0 }); %> / night
-                    </p>
-                  </div>
-                </div>
-              </a>
-              <% } else { %>
-                <li>Invalid listing ID</li>
-                <% } %>
-                  <% } %>
-                    <% } else { %>
-                      <li>No listings available</li>
-                      <% } %>
+    .filter:hover {
+      opacity: 1;
+    }
+
+    .filter p {
+      font-size: 0.8rem;
+      width: 100%;
+    }
+
+    .filter-icons {
+      width: 98vh;
+      overflow-x: scroll;
+      display: flex;
+      scrollbar-width: none;
+      /* Firefox */
+      -ms-overflow-style: none;
+      /* IE and Edge */
+    }
+
+
+    .filter-icons::-webkit-scrollbar {
+      display: none;
+      /* Chrome, Safari, Opera */
+    }
+
+    .tax-info {
+      display: none;
+    }
+
+    .tax-toggle {
+      border: 1px solid #111;
+      padding: 10px 10px;
+      border-radius: 10px;
+      margin-left: 30px;
+    }
+  </style>
+
+  <div id="filters">
+    <div class="filter-icons">
+      <div class="filter">
+        <div>
+          <i class="fa-solid fa-fire"></i>
+        </div>
+        <p><span>Trending</span></p>
       </div>
-  </body>
+      <div class="filter">
+        <div> <i class="fa-solid fa-bed mx-auto"></i></div>
+        <p><span>Rooms</span></p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-mountain-city"></i> </div>
+        <p><span>Iconic cities</span></p>
+      </div>
+      <div class="filter">
+        <div> <i class="fa-solid fa-mountain"></i> </div>
+        <p><span>Mountain</span></p>
+      </div>
+      <div class="filter">
+        <div> <i class="fa-brands fa-fort-awesome"></i> </div>
+        <p><span>Castles</span></p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-person-swimming"></i> </div>
+        <p><span>Amazing pools</span></p>
+      </div>
+      <div class="filter">
+        <div> <i class="fa-solid fa-campground"></i> </div>
+        <p><span>Camping</span></p>
+      </div>
+      <div class="filter">
+        <div> <i class="fa-solid fa-cow"></i> </div>
+        <p><span>Farms</span></p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-regular fa-snowflake"></i> </div>
+        <p><span>Artic</span></p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-landmark-dome"></i> </div>
+        <p><span>Domes</span></p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-swatchbook"></i></div>
+        <p><span>Design</span></p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-regular fa-snowflake"></i> </div>
+        <p><span>Creative spaces</span></p>
+      </div>
+    </div>
+
+    <div class="tax-toggle">
+      <div class="form-check-reverse form-switch">
+        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+        <label class="form-check-label" for="flexSwitchCheckDefault">Display Total after Taxes</label>
+      </div>
+    </div>
+
+  </div>
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 row-cols-1 mt-3">
+    <% if (allListings && allListings.length> 0 ) { %>
+      <% for (let listing of allListings) { %>
+
+        <% if (listing._id) { %>
+          <a href="/listings/<%= listing._id %>" class="listing-link">
+            <div class="card col listing-card">
+              <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height: 20rem;">
+              <div class="card-img-overlay">
+                <p>
+                  <%= listing.title %>
+                </p>
+              </div>
+              <div class="card-body">
+                <p class="card-text">
+                  <b>
+                    <%= listing.title %>
+                  </b> <br>
+                  <%= listing.price.toLocaleString('en-IN', { style: 'currency' , currency: 'INR'
+                    ,minimumFractionDigits: 0, maximumFractionDigits: 0 }); %> / night
+                    <i class="tax-info">&nbsp;&nbsp;18% GST</i>
+                </p>
+
+              </div>
+            </div>
+          </a>
+          <% } else { %>
+            <li>Invalid listing ID</li>
+            <% } %>
+              <% } %>
+                <% } else { %>
+                  <h3>No listings available</h3>
+                  <% } %>
+  </div>
+
+  <script>
+    let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+    taxSwitch.addEventListener("click", () => {
+      console.log("clicked")
+      let taxInfo = document.getElementsByClassName('tax-info');
+      for (info of taxInfo) {
+        if (info.style.display != "inline") {
+          info.style.display = "inline";
+        } else {
+          info.style.display = "none";
+        }
+      }
+    })
+  </script>

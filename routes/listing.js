@@ -15,8 +15,12 @@ const upload = multer({ storage })
 router.route("/")
     // Index Route from listing cantrollers
     .get(wrapAsync(listingCantroller.index))
+
     //create route
     .post(isLoggedIn, upload.single('listing[image]'), validateListing, wrapAsync(listingCantroller.createListing));
+
+
+router.get('/search', wrapAsync(listingCantroller.searchListing))
 
 
 

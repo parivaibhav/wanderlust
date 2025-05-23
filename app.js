@@ -10,6 +10,7 @@ const listingsRoutes = require("./routes/listing.js");
 const reviewsRoutes = require("./routes/review.js");
 const usersRoutes = require("./routes/user.js")
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local")
@@ -18,14 +19,17 @@ const User = require("./models/user.js");
 
 main()
     .then(() => {
-        console.log("Connected to DB");
+        console.log("Connected to MongoDB");
     })
     .catch((err) => {
         console.error("DB connection error:", err);
     });
 
 async function main() {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(process.env.MONGODB_URI, {
+        serverSelectionTimeoutMS: 30000, // 20 seconds
+        useNewUrlParser: true, useUnifiedTopology: true,
+    });
 }
 
 app.engine("ejs", ejsMate);
@@ -35,7 +39,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
+
+const store = MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    crypto: {
+        secret: "mysupersecretcode",
+    },
+    touchAfter: 24 * 3600,
+});
+
+store.on("error", () => {
+    console.log("ERROR in MONGO SESSION STORE", err);
+})
+
 const sessionOptions = {
+    store: store,
     secret: "mysupersecretcode",
     resave: false,
     saveUninitialized: true,
@@ -46,13 +64,9 @@ const sessionOptions = {
     }
 }
 
-app.get("/", (req, res) => {
-    res.send("Hi, I am root");
-});
-
-
 app.use(session(sessionOptions));
 app.use(flash());
+
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()))

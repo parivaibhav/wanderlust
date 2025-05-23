@@ -4,7 +4,16 @@ const Listing = require("../models/listing.js");
 
 module.exports.index = async (req, res) => {
     const allListings = await Listing.find({});
-    res.render("listings/index", { allListings });
+    // Modify each image URL to be responsive and fill using Cloudinary transformations
+    const listingsWithResponsiveImages = allListings.map(listing => {
+        let imageUrl = listing.image?.url;
+        if (imageUrl) {
+            // Add 'c_fill,w_600,h_400' for fill and responsive size
+            imageUrl = imageUrl.replace("/upload", "/upload/c_fill,w_600,h_400");
+        }
+        return { ...listing.toObject(), image: { ...listing.image, url: imageUrl } };
+    });
+    res.render("listings/index", { allListings: listingsWithResponsiveImages });
 }
 
 module.exports.renderNewForm = (req, res) => {
@@ -13,20 +22,30 @@ module.exports.renderNewForm = (req, res) => {
 
 module.exports.showListing = async (req, res) => {
     const { id } = req.params;
-    const listing = await Listing.findById(id).populate({ path: "reviews", populate: { path: "author" } }).populate("owner"); // populate reviews
+    const listing = await Listing.findById(id)
+        .populate({ path: "reviews", populate: { path: "author" } })
+        .populate("owner");
     if (!listing) {
         req.flash("error", "Listing Not Exists!");
-        res.redirect("/listings");
+        return res.redirect("/listings");
     }
-    //  console.log(listing)
-    res.render("listings/show.ejs", { listing });
+    // Reduce image quality for display
+    let imageUrl = listing.image?.url;
+    if (imageUrl) {
+        imageUrl = imageUrl.replace("/upload", "/upload/h_300,w_300/q_20");
+    }
+    res.render("listings/show.ejs", { listing, imageUrl });
 }
 
 module.exports.createListing = async (req, res, next) => {
     try {
         let url = req.file?.path;
         let filename = req.file.filename;
-        console.log(url, filename);
+
+        // Modify Cloudinary image URL to reduce quality and size
+        if (url) {
+            url = url.replace("/upload", "/upload/h_300,w_300/q_20");
+        }
 
         const newListing = new Listing(req.body.listing);
         // Set the current logged-in user as the owner
@@ -84,4 +103,23 @@ module.exports.destroyListing = async (req, res) => {
     if (!deletedListing) throw new ExpressError(404, "Listing not found");
     req.flash("error", "Listing Deleted Sucessfully!")
     res.redirect("/listings");
+}
+
+module.exports.searchListing = async (req, res) => {
+    const searchQuery = req.query.q || '';
+
+    try {
+        const allListings = await Listing.find({
+            $or: [
+                { title: { $regex: searchQuery, $options: 'i' } },
+                { location: { $regex: searchQuery, $options: 'i' } },
+                { country: { $regex: searchQuery, $options: 'i' } }
+            ]
+        });
+
+        res.render('listings/index', { allListings, searchQuery }); // Render your view
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+    }
 }
