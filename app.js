@@ -94,7 +94,7 @@ app.use((req, res, next) => {
 // })
 
 app.get("/", async (req, res) => {
-    res.render("/listings/home.ejs");
+    res.render("/listings/home");
 })
 
 app.use("/listings", listingsRoutes);
