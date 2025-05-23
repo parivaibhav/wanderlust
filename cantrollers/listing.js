@@ -1,7 +1,7 @@
 const Listing = require("../models/listing.js");
 
 module.exports.homeRoute = async (req, res) => {
-    res.redirect("/listings/index.ejs");
+    res.render("/listings/home.ejs");
 }
 
 module.exports.index = async (req, res) => {
