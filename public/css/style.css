@@ -145,6 +145,23 @@ body {
 
 footer {
   margin: 0;
+  height: auto; 
+}
+
+.f-info-socials {
+  margin: 10px 0px;
+}
+
+footer .fa-brands {
+  padding: 10px;
+  border: 1px solid #fe424d;
+  border-radius: 50%;
+  color: #fe424d;
+}
+
+footer .fa-brands:hover {
+  background: #fe424d;
+  color: #fff;
 }
 
 h1,
@@ -155,4 +172,3 @@ h5,
 h6 {
   font-family: "Airbnb Medium" !important;
 }
-
