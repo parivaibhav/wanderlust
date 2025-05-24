@@ -1,32 +1,40 @@
 <% layout("/layouts/boillerplate.ejs") %>
 
+    <div class="container"></div>
     <div class="row justify-content-center mb-5">
-        <div class="col-6">
-            <div class="card mt-5 shadow p-5">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+            <div class="card mt-5 shadow p-4 p-md-5">
                 <div class="card-body">
-                    <h1 class="card-title text-center mb-4">SignUp on Wanderlust</h1>
+                    <h1 class="card-title text-center mb-4 fs-3">Sign Up on Wanderlust</h1>
                     <form action="/signup" method="post" class="needs-validation" novalidate>
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input name="username" type="text" class="form-control" id="username" required />
+                            <input name="username" type="text" class="form-control" id="username" required
+                                autocomplete="username" />
                             <div class="valid-feedback">Looks good!</div>
-                            <div class="invalid-feedback">please enter valid Username</div>
+                            <div class="invalid-feedback">Please enter a valid username.</div>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
-                            <input name="email" type="email" class="form-control" id="email" required />
+                            <input name="email" type="email" class="form-control" id="email" required
+                                autocomplete="email" />
                             <div class="valid-feedback">Looks good!</div>
-                            <div class="invalid-feedback">please enter valid Email Address</div>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input name="password" type="password" class="form-control" id="password" required />
+                            <input name="password" type="password" class="form-control" id="password" required
+                                autocomplete="new-password" minlength="6" />
                             <div class="valid-feedback">Looks good!</div>
-                            <div class="invalid-feedback">please enter valid Password</div>
+                            <div class="invalid-feedback">Please enter a valid password (min 6 characters).</div>
                         </div>
-                        <button class="btn btn-danger w-100">Sign up</button>
+                        <button class="btn btn-danger w-100 py-2" type="submit">Sign Up</button>
                     </form>
+                    <div class="text-center mt-3">
+                        <small>Already have an account? <a href="/login">Log in</a></small>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
